@@ -9,23 +9,19 @@ import { useRouter } from 'next/router';
 import Navbar from '@/components/Navbar';
 
 const MyComponent = () => {
-  const router = useRouter();//chuyển trang
   const [web3, setWeb3] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [contract, setContract] = useState(null);
-  const [votingContract, setVotingContract] = useState(null);
-  const [balance, setBalance] = useState(null);
-  const [symbol, setSymbol ] = useState(null);
-  const [name, setName ] = useState(null);
-  const [addressBTC, setaddressBTC ] = useState(null);
-  const [recipient, setRecipient] = useState('');
-  const [amount, setAmount] = useState('');
-  const [loading, setLoading] = useState(false); // Biến trạng thái tạm thời
-  const [contractInitialized, setContractInitialized] = useState(false);
+  const [account, setAccount] = useState(null); //gán tài khoản đăng nhập 
+  const [contract, setContract] = useState(null); //gán hợp đồng tạo thành công
+  const [votingContract, setVotingContract] = useState(null); //gán hợp đồng tạo thành công Voting
+  const [balance, setBalance] = useState(null); //gán số dư đồng itoken
+  const [addressBTC, setaddressBTC ] = useState(null); //gán địa chỉ của BTC
+  const [recipient, setRecipient] = useState(''); //
+  const [amount, setAmount] = useState(''); //gán số 
+  const [contractInitialized, setContractInitialized] = useState(false); //kiểm tra SC đã thực thi chưa
   const [allowance, setallowance] = useState(null); // kiểm tra xem đã ủy quyền cho SC bao nhiêu
   const [statusSC, setStatusSC ] = useState(); // trạng tháng của SC
 
-  const [candidateId, setCandidateId] = useState('');
+  const [candidateId, setCandidateId] = useState('');//các tham số thêm ứng viên
   const [candidateName, setCandidateName] = useState('');
   const [candidateDescription, setCandidateDescription] = useState('');
 
@@ -40,7 +36,7 @@ const MyComponent = () => {
   const [searchResult, setSearchResult] = useState(null);
   const [notFound, setNotFound] = useState(false);// thông báo tìm thấy ứng viên hay không
 
-  const [showBTCInfo, setShowBTCInfo] = useState(false);
+  const [showBTCInfo, setShowBTCInfo] = useState(false); //kiểm tra xem phải btc khong
 
 
   useEffect(() => {
@@ -57,10 +53,6 @@ const MyComponent = () => {
           const accounts = await web3Instance.eth.getAccounts();
           setAccount(accounts[0]); // Lấy tài khoản đầu tiên
 
-          // Địa chỉ của smart contract và ABI
-          const contractAddress = 'YOUR_CONTRACT_ADDRESS';
-          const abi = []; // ABI của smart contract
-
           // Khởi tạo instance của Itoken
           const myContract = new web3Instance.eth.Contract(Contract.ItokenABI, Contract.ItokenAddress, Contract.VotingABI, Contract.VotingAddress);
           setContract(myContract);
@@ -69,10 +61,9 @@ const MyComponent = () => {
           const votingContractInstance = new web3Instance.eth.Contract(Contract.VotingABI, Contract.VotingAddress);
           setVotingContract(votingContractInstance);
 
-        // Gọi hàm getSymbol để lấy symbol và cập nhật state
+        // xác nhận SC đã được thực thi
         setContractInitialized(true);
 
-        
         } catch (error) {
           console.error(error);
         }
@@ -81,11 +72,9 @@ const MyComponent = () => {
     loadWeb3();
   }, []);
 
-  // useEffect để gọi hàm getSymbol sau khi contract đã được thiết lập
+  // useEffect để gọi các hàm sau khi contract đã được thiết lập
   useEffect(() => {
     if (contractInitialized) {
-      getSymbol();
-      getName();
       getAddressBTC();
       statusSmartContract();
       getCandidateList();
@@ -99,19 +88,13 @@ const MyComponent = () => {
     setShowBTCInfo(account === addressBTC);
   }, [account, addressBTC]);
 
-  // // kiểm tra có phải là địa chỉ BTC không
-  // useEffect(() => {
-  //   // Kiểm tra xem address từ Metamask có phải là addressBTC không
-  //   setIsBTCAddress(account === addressBTC);
-  // }, [account, addressBTC]);
-
   const setContentNameSC = async () => {
     if (account !== addressBTC) {
       alert("Chỉ địa chỉ BTC mới có thể thực hiện");
       return;
     }
     try {
-      // Gọi hàm symbol từ smart contract
+      // Gọi hàm setContestName từ smart Votingcontract
       const result = await votingContract.methods.setContestName(nameSC).send({from: account });
       setNameSC(result.toString());
     } catch (error) {
@@ -123,29 +106,8 @@ const MyComponent = () => {
     try {
       // Gọi hàm balanceOf từ smart contract
       const result = await contract.methods.balanceOf(account).call();
+      // gán kết quả vào
       setBalance(result.toString());
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getSymbol = async () => {
-    try {
-      // Gọi hàm symbol từ smart contract
-      const result = await contract.methods.symbol().call();
-      setSymbol(result);
-      
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getName = async () => {
-    try {
-      // Gọi hàm symbol từ smart contract
-      const result = await contract.methods.name().call();
-      setName(result);
-      
     } catch (error) {
       console.error(error);
     }
@@ -156,7 +118,6 @@ const MyComponent = () => {
       // Gọi hàm symbol từ smart contract
       const result = await votingContract.methods.addressBTC().call();
       setaddressBTC(result);
-      
     } catch (error) {
       console.error(error);
     }
@@ -168,13 +129,13 @@ const MyComponent = () => {
       return;
     }
     try {
-      // Thực hiện gọi hàm mở bỏ phiếu trên smart contract
-      const result = await votingContract.methods.openVoting().send({ from: account });
+      // Thực hiện gọi hàm mở Votingcontract
+      await votingContract.methods.openVoting().send({ from: account });
       setStatusSC(true);
       alert("Cuộc bình chọn đã mở");
       // Xử lý các hành động sau khi mở bỏ phiếu thành công
     } catch (error) {
-      console.error('Error opening voting:', error);
+      console.error(error);
       // Xử lý các hành động khi có lỗi xảy ra
     }
   };
@@ -185,17 +146,16 @@ const MyComponent = () => {
       return;
     }
     try {
-      // Thực hiện gọi hàm mở bỏ phiếu trên smart contract
-      const result = await votingContract.methods.closeVoting().send({ from: account });
+      // Thực hiện gọi hàm đóng trên Votingcontract
+      await votingContract.methods.closeVoting().send({ from: account });
       setStatusSC(false);
-      alert("Cuộc bình chọn đã mở");
+      alert("Cuộc bình chọn đã đóng");
       // Xử lý các hành động sau khi mở bỏ phiếu thành công
     } catch (error) {
-      console.error('Error opening voting:', error);
+      console.error(error);
       // Xử lý các hành động khi có lỗi xảy ra
     }
   };
-  
 
   // trạng thái của smartcontract
   const statusSmartContract = async () => {
@@ -209,6 +169,7 @@ const MyComponent = () => {
     }
   }
 
+  //kiểm tra trạng thái gọi hàm thích hơp
   const OpenOrCloseSC = async () => {
     if (statusSC) {
       closeVoting(); // Gọi hàm closeVoting nếu statusSC là true
@@ -217,48 +178,38 @@ const MyComponent = () => {
     }
   }
 
+  //số token đã ủy quyền cho VotingContract
   const handleAllowance = async () => {
     try {
-      // Sử dụng địa chỉ của hợp đồng VotingAddress từ Contract
-      const votingAddress = Contract.VotingAddress;
       // Sử dụng hàm approve từ smart contract
-      const result = await contract.methods.allowance(account, votingAddress).call();
+      const result = await contract.methods.allowance(account, Contract.VotingAddress).call();
       setallowance(result.toString());
     } catch (error) {
       console.error(error);
-
     }
   };
 
-
-
+  //chuyển token
   const handleTransfer = async () => {
     try {
       await contract.methods.transfer(recipient, amount).send({ from: account });
       setBalance(balance - amount);
-      alert(`Đã chuyển thành công ${amount} tokens 
-      Cho địa chỉ ${recipient}`);
+      alert(`Đã chuyển thành công ${amount} tokens  Cho địa chỉ ${recipient}`);
       handleGetBalance();
     } catch (error) {
       console.error(error);
-      setLoading(false);
     }
   };
 
+  //ủy quyền
   const handleApprove = async () => {
     try {
-      setLoading(true);
-      // Sử dụng địa chỉ của hợp đồng VotingAddress từ Contract
-      const votingAddress = Contract.VotingAddress;
       // Sử dụng hàm approve từ smart contract
-      await contract.methods.approve(votingAddress, amount).send({ from: account });
-      alert(`Đã ủy quyền thành công ${amount} tokens cho
-       Hợp đồng Voting ${votingAddress}`);
+      await contract.methods.approve(Contract.VotingAddress, amount).send({ from: account });
+      alert(`Đã ủy quyền thành công ${amount} tokens cho Hợp đồng Voting ${votingAddress}`);
       handleAllowance();
-      setLoading(false);
     } catch (error) {
       console.error(error);
-      setLoading(false);
     }
   };
 
@@ -277,7 +228,7 @@ const MyComponent = () => {
       // Gọi hàm addCandidate từ smart contract
       await votingContract.methods
         .addCandidate(candidateId, candidateName, candidateDescription)
-        .send({ from: account }); // Thay yourAddress bằng địa chỉ của bạn
+        .send({ from: account }); //
 
       // Hiển thị thông báo thành công nếu gọi hàm thành công
       alert('Đã thêm ứng viên thành công');
@@ -295,7 +246,7 @@ const MyComponent = () => {
       // Gọi hàm getCandidateList từ smart contract
       const result = await votingContract.methods.getCandidateList().call();
 
-      // Giải mã kết quả
+      // gán kết quả
       const ids = result[0].map(id => id.toString());
       const names = result[1];
       const numVotes = result[2].map(id => id.toString());
@@ -309,7 +260,6 @@ const MyComponent = () => {
 
       // Cập nhật state để render lại giao diện
       setCandidates(candidateList);
-      console.log(candidateList);
     } catch (error) {
       console.error(error);
     }
@@ -344,6 +294,7 @@ const MyComponent = () => {
       return;
     }
     try {
+      //gọi hàm removeCandidate để xóa ứng viên theo ID
       await votingContract.methods.removeCandidate(candidateId).send({ from: account });
       console.log(`Candidate with ID ${candidateId} removed successfully.`);
       // Tải lại danh sách ứng viên sau khi xóa
@@ -354,7 +305,7 @@ const MyComponent = () => {
     }
   };
   
-  // Hàm xử lý khi nhấn nút "Update"
+  // Hàm "Update"
   const handleUpdateCandidate = async () => {
     try {
       // Kiểm tra xem có đang cập nhật ứng viên nào không
@@ -381,7 +332,7 @@ const MyComponent = () => {
     setNewDescription('');
   };
 
-
+  //tìm kiếm
   const searchCandidate = async (searchValue) => {
     try {
       // Kiểm tra xem searchValue là số hay chuỗi
@@ -426,8 +377,7 @@ const MyComponent = () => {
     }
   };
   
-  
-  
+  //thu hồi itoken từ SC về BTC
   const withdrawToken = async () => {
     if (account !== addressBTC) {
       alert("Chỉ địa chỉ BTC mới có thể thực hiện");
@@ -435,7 +385,7 @@ const MyComponent = () => {
     }
     try {
       await votingContract.methods.withdrawToken().send({ from: account });
-      alert("Withdrawal successful!");
+      alert("Đã thu hồi thành công");
     } catch (error) {
       console.error("Withdrawal error:", error);
       alert("Withdrawal failed. Please try again later.");
@@ -447,7 +397,6 @@ const MyComponent = () => {
     <div className={styles.myComponent}>
       <Navbar/>
       <h1 className={styles.componentTitle}>Cuộc thi {nameSC}</h1>
-
 
       <div>
         {showBTCInfo && (

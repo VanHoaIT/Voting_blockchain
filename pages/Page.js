@@ -7,7 +7,6 @@ const Page = () => {
     <div>
       <Navbar />
       <h1>Ban tổ chức</h1>
-      
     </div>
   );
 };
