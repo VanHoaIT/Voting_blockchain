@@ -1,0 +1,48 @@
+.myComponent {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .componentTitle {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .currentAccount {
+    margin-bottom: 10px;
+  }
+  
+  .button_get {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .button_small{
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: #FF0000;
+    color: #FFFF33;
+  }
+  
+  .p_get {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .input_get_number {
+    padding: 5px 10px;
+    width: 100px;
+  }
+
+  .input_get_text {
+    padding: 5px 10px;
+    width: 300px;
+  }
+  
