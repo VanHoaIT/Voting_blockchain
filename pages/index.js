@@ -307,6 +307,10 @@ const MyComponent = () => {
   
   // Hàm "Update"
   const handleUpdateCandidate = async () => {
+    if (account !== addressBTC) {
+      alert("Chỉ địa chỉ BTC mới có thể thực hiện");
+      return;
+    }
     try {
       // Kiểm tra xem có đang cập nhật ứng viên nào không
       if (updatingCandidateId !== null && newName !== '' && newDescription !== '') {
@@ -395,153 +399,240 @@ const MyComponent = () => {
 
   return (
     <div className={styles.myComponent}>
-      <Navbar/>
-      <h1 className={styles.componentTitle}>Cuộc thi {nameSC}</h1>
 
-      <div>
-        {showBTCInfo && (
-          <div>
-            <input 
-              className = {styles.input_get_text}
-              type="text" 
-              placeholder="tên cuộc thi" 
-              onChange={(e) => setNameSC(e.target.value)}
+      <h1 className={styles.title_hh}>Cuộc thi {nameSC}</h1>
+
+
+
+      <div className={styles.currentAccount}><p><b>Địa chỉ hiện tại:</b></p> <p className={styles.value}>{account}</p></div>
+      <div className={styles.currentAccount}><p><b>Token đang có:</b></p> <p className={styles.value}>{balance} ITK</p></div>
+      <div className={styles.currentAccount}><p><b>Token đã uỷ quyền:</b></p> <p className={styles.value}>{allowance} ITK</p></div>
+
+      <div className={styles.group_2}>
+        <div>
+          <h5 className={styles.title_2}>Uỷ quyền</h5>
+          <div className={styles.get_number}>
+            <input
+              className={styles.input_get_number}
+              type="number"
+              placeholder="Số lượng"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
             />
-            <button className={styles.button_get} onClick={() => setContentNameSC(nameSC)}>
-              Đặt tên Name SC
-            </button>
-
-
-            <button 
-              className={styles.button_get}
-              onClick={OpenOrCloseSC} // Gọi hàm handleVotingAction khi nhấn nút
-              style={{ backgroundColor: statusSC ? 'green' : 'blue'}} // Áp dụng màu và kiểu con trỏ tùy thuộc vào giá trị của statusSC
-            >
-              {statusSC ? 'Close' : 'Open'} Voting
-            </button>
-
           </div>
-        )}
-      </div>
-      
+          <button className={styles.button_get_2} onClick={handleApprove} disabled={!amount}>
+            Ủy quyền
+          </button>
+        </div>
 
-      <p className={styles.currentAccount}>Current Account: {account}</p>
 
-      <p className={styles.p_get}>Balance: {balance} ITK</p>
-    
-      <p className={styles.p_get}>Allowance: {allowance}</p>
-
-      <input 
-        className = {styles.input_get_number}
-        type="number" 
-        placeholder="Amount" 
-        value={amount} 
-        onChange={(e) => setAmount(e.target.value)} 
-      />
-      <button className={styles.button_get} onClick={handleApprove} disabled={!amount || loading}>
-        Approve
-      </button>
-    <br/>
-      <input 
-        className = {styles.input_get_text}
-        type="text" 
-        placeholder="Recipient Address" 
-        value={recipient} 
-        onChange={(e) => setRecipient(e.target.value)} 
-      />
-      <input 
-        className = {styles.input_get_number}
-        type="number" 
-        placeholder="Amount" 
-        value={amount} 
-        onChange={(e) => setAmount(e.target.value)} 
-      />
-      <button className={styles.button_get} onClick={handleTransfer} disabled={!recipient || !amount}>
-        Transfer
-      </button>
-
-      
-
-      <div>
-        <h1>Add Candidate</h1>
-        <label>Candidate ID:</label>
-        <input
-          className = {styles.input_get_number}
-          type="text"
-          value={candidateId}
-          onChange={(e) => setCandidateId(e.target.value)}
-        />
-        <label>Candidate Name:</label>
-        <input
-          className = {styles.input_get_text}
-          type="text"
-          value={candidateName}
-          onChange={(e) => setCandidateName(e.target.value)}
-        />
-        <label>Candidate Description:</label>
-        <input
-          className = {styles.input_get_text}
-          type="text"
-          value={candidateDescription}
-          onChange={(e) => setCandidateDescription(e.target.value)}
-        />
-        <button button className={styles.button_get} onClick={handleAddCandidate}>Add Candidate</button>
+        <div>
+          <h5 className={styles.title_2}>Chuyển token</h5>
+          <div className={styles.div_group_2}>
+            <input
+              className={styles.input_get_text}
+              type="text"
+              placeholder="Địa chỉ đến"
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+            />
+            <input
+              className={styles.input_get_number}
+              type="number"
+              placeholder="Số lượng"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
+          <div className={styles.button_get_22}>
+            <button className={styles.button_get} onClick={handleTransfer} disabled={!recipient || !amount}>
+              Chuyển
+            </button>
+          </div>
+        </div>
       </div>
 
-      <p>Voting Status: {statusSC ? 'Open' : 'Closed'}</p>
+
+
+      {/*<p>Voting Status: {statusSC ? 'Open' : 'Closed'}</p>*/}
 
       <div>
-        <h2>Candidate List</h2>
-        <ul>
-          {candidates.map(candidate => (
-            <li key={candidate.id}>
-              ID: {candidate.id}, Name: {candidate.name}, Votes: {candidate.numVotes}
-              <button className={styles.button_small} onClick={() => handleVote(candidate.id)}>Vote</button>
-              <button className={styles.button_small} onClick={() => removeCandidate(candidate.id)}>Romove</button>
-              {updatingCandidateId === candidate.id ? (
-                <div>
-                  <input type="text" placeholder="New Name" value={newName} onChange={e => setNewName(e.target.value)} />
-                  <input type="text" placeholder="New Description" value={newDescription} onChange={e => setNewDescription(e.target.value)} />
-                  <button className={styles.button_small} onClick={handleUpdateCandidate}>Update</button>
-                  <button className={styles.button_small} onClick={handleCancelUpdate}>Cancel</button>
+        <h2 className={styles.title_candidate_list}>Danh sách ứng viên</h2>
+        <div className={styles.div_table}>
+          <table className={styles.container}>
+            <thead>
+              {/* className={styles.th_table}*/}
+              <tr className={styles.head}>
+                <th>ID</th>
+                <th>Tên ứng viên</th>
+                <th>Số lượng bình chọn</th>
+                <th>Tùy chọn</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                candidates.map(candidate => (
+                  <tr>
+                    <td data-title="ID">{candidate.id}</td>
+                    <td data-title="Name">{candidate.name}</td>
+                    <td data-title="Link" className={styles.center_vote}>{candidate.numVotes}</td>
+                    <td data-title="Status">
+                      <button className={styles.button_1} onClick={() => handleVote(candidate.id)}>Bình chọn</button>
+                      <button className={styles.button_2} onClick={() => removeCandidate(candidate.id)}>Xoá ứng viên</button>
+                      {updatingCandidateId === candidate.id ? (
+                        <div>
+                          <input className={styles.input_update} type="text" placeholder="Tên mới" value={newName} onChange={e => setNewName(e.target.value)} />
+                          <input className={styles.input_update} type="text" placeholder="Mô tả mới" value={newDescription} onChange={e => setNewDescription(e.target.value)} />
+                          <button className={styles.button_update_1} onClick={handleUpdateCandidate}>Update</button>
+                          <button className={styles.button_update_2} onClick={handleCancelUpdate}>Cancel</button>
+                        </div>
+                      ) : (
+                        <button className={styles.button_3} onClick={() => setUpdatingCandidateId(candidate.id)}>Cập nhật</button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+
+          <div className={styles.container_search}>
+            <div className={styles.search_candidate}>
+              <div className={styles.group_search}>
+                <div className={styles.input_container}>
+                  <input
+                    type="text"
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className={styles.input}
+                    placeholder='Nhập id hoặc tên ứng viên'
+                  />
                 </div>
-              ) : (
-                <button className={styles.button_small} onClick={() => setUpdatingCandidateId(candidate.id)}>Update</button>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+                <button
+                  onClick={() => searchCandidate(searchValue)}
+                  className={styles.button_search}
+                >
+                  Tìm kiếm
+                </button>
+              </div>
 
-      <div>
-        <h2>Candidate Search</h2>
-        <input type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
-        <button onClick={() => searchCandidate(searchValue)}>Search</button>
+              {notFound ? (
+                <p className={styles.no_candidate}>Không tìm thấy ứng viên!</p>
+              ) : searchResult ? (
+                <div className={styles.result}>
+                  {/* <h2>Search Result</h2> */}
+                  <p><b className={styles.title_candidate}>ID:</b> {searchResult.id}</p>
+                  <p><b className={styles.title_candidate}>Tên ứng viên:</b> {searchResult.name}</p>
+                  <p><b className={styles.title_candidate}>Mô tả:</b> {searchResult.description}</p>
+                  <p><b className={styles.title_candidate}>Số lượt bình chọn:</b> {searchResult.numVote}</p>
+                </div>
+              ) : null}
+            </div>
 
-        {notFound ? (
-          <p>No candidate found.</p>
-        ) : searchResult ? (
-          <div>
-            <h2>Search Result</h2>
-            <p>ID: {searchResult.id}</p>
-            <p>Name: {searchResult.name}</p>
-            <p>Description: {searchResult.description}</p>
-            <p>Number of Votes: {searchResult.numVote}</p>
           </div>
-        ) : null}
+        </div>
       </div>
 
-      <button 
-        className={styles.button_get}
-        onClick={withdrawToken}
-        style={{ backgroundColor: 'blue', cursor: 'pointer' }}
-      >
-        Withdraw Token
-      </button>
+      <div className={styles.lich_su}>
+        <p>
+          <a href='https://baobab.klaytnscope.com/account/0x162668bEfDD2ff85F7305cCAa660E0fC36c9131C?tabId=txList' target='_blank'>Lịch sử bình chọn</a>
+        </p>
+      </div>
 
 
+      <div className={styles.foot}>
+        <div>
+          {showBTCInfo && (
+            <div>
+              <div>
+                {(
+                  <div className={styles.group_1}>
+                    <div className={styles.input_container_name}>
+                      <input
+                        className={styles.input_name}
+                        type="text"
+                        placeholder="Tên cuộc thi"
+                        onChange={(e) => setNameSC(e.target.value)}
+                      />
+                    </div>
+                    <button className={styles.button_name} onClick={() => setContentNameSC(nameSC)}>
+                    Đặt tên
+                    </button>
+                  </div>
+                )}
+              </div>
+    
+              <div className={styles.group_add}>
+                {/* <h1>Add Candidate</h1> */}
+                {/* <label>Candidate ID:</label> */}
+                <div className={styles.input_container_add}>
+                  <input
+                    className={styles.input_add}
+                    type="text"
+                    value={candidateId}
+                    onChange={(e) => setCandidateId(e.target.value)}
+                    placeholder=' '
+                  />
+                  <div className={styles.cut_1}></div>
+                  <label for="ID" className={styles.placeholder}>ID</label>
+                </div>
+                {/* <label>Candidate Name:</label> */}
+                <div className={styles.input_container_add} id={styles.input_1}>
+                  <input
+                    className={styles.input_add}
+                    type="text"
+                    value={candidateName}
+                    onChange={(e) => setCandidateName(e.target.value)}
+                    placeholder=' '
+                  />
+                  <div className={styles.cut_2}></div>
+                  <label for="Name" className={styles.placeholder}>Tên ứng viên</label>
+                </div>
+                {/* <label>Candidate Description:</label> */}
+                <div className={styles.input_container_add} id={styles.input_2}>
+                  <input
+                    className={styles.input_add}
+                    type="text"
+                    value={candidateDescription}
+                    onChange={(e) => setCandidateDescription(e.target.value)}
+                    placeholder=' '
+                  />
+                  <div className={styles.cut_3}></div>
+                  <label for="Description" className={styles.placeholder}>Mô tả</label>
+                </div>
+                <button button className={styles.button_add} onClick={handleAddCandidate}>Thêm ứng viên</button>
+              </div>
+    
+            </div>
+          )}
+        </div>
+
+        <div>
+          {showBTCInfo && (
+            <div>          
+              <button
+                className={styles.button_open}
+                onClick={OpenOrCloseSC} // Gọi hàm handleVotingAction khi nhấn nút
+                style={{ backgroundColor: statusSC ? 'green' : 'blue' }} // Áp dụng màu và kiểu con trỏ tùy thuộc vào giá trị của statusSC
+              >
+                {statusSC ? 'Đóng' : 'Mở'} cuộc bình chọn
+              </button>
+    
+              <button
+                className={styles.button_withdraw}
+                onClick={withdrawToken}
+                style={{ backgroundColor: 'blue', cursor: 'pointer' }}
+              >
+                Thu hồi token
+              </button>
+            </div>
+          )}
+        </div>
+        
+      </div>
 
     </div>
+
   );
 };
 
