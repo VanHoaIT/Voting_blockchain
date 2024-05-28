@@ -1,823 +1,182 @@
+/* Container */
 .myComponent {
-  margin: 20px;
+  background-color: #f5f5f5;
+  border: 2px solid #ddd;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #566886;
-  color: #FFFF33;
+  max-width: 800px; /* Giới hạn chiều rộng của container */
+  margin: 0 auto; /* Canh giữa container */
 }
 
-.componentTitle {
-  font-size: 24px;
+/* Tiêu đề chào mừng */
+.welcom {
+  color: #ff5733;
+  font-size: 48px;
   font-weight: bold;
-}
-
-.currentAccount {
-  height: 40px;
-  font-size: 16px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: start;
-}
-
-.button_get {
-  padding: 12px 10px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  margin: 2px 2px 2px 2px;
-}
-
-.button_small {
-  border-radius: 5px;
-  padding: 5px 10px;
-  background-color: #FF0000;
-  color: #FFFF33;
-}
-
-
-.input_get_number {
-  margin-right: 25px;
-  padding: 10px 10px;
-  width: 300px;
-  border-radius: 50px;
-  border: 1px solid black;
-}
-
-.input_get_text {
-
-  margin-right: 25px;
-  padding: 10px 10px;
-  width: 300px;
-  border-radius: 50px;
-  border: 1px solid black;
-}
-
-.title_hh {
-  color: #F1C03C;
   text-align: center;
+  margin: 20px 0;
 }
 
-.group_1 {
-  margin: 10px 10px 10px 0px;
-  display: flex;
-  align-items: center;
-  justify-content: start;
-}
-
-/*---- create name----*/
-.input_container_name {
-  height: 50px;
-  position: relative;
-  width: 35%;
-}
-
-.input_name {
-  background-color: #303245;
-  border-bottom-left-radius: 12px;
-  border-top-left-radius: 12px;
-  border: 0;
-  box-sizing: border-box;
-  color: #eee;
-  font-size: 18px;
-  height: 100%;
-  outline: 0;
-  padding: 0px 20px 0;
-  width: 100%;
-}
-
-.button_name {
-  background-color: #D28B58;
-  border-bottom-right-radius: 12px;
-  border-top-right-radius: 12px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  height: 40px;
-  line-height: 20px;
-  list-style: none;
-  margin: 2px;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  height: 50px;
-}
-
-.button_name:hover,
-.button_name:focus {
-  background-color: #d2986f;
-}
-
-
-/*---1 columns ---*/
-
-.value {
-  color: #FDFCFB;
-  margin-left: 5px;
-}
-
-
-/*---2---*/
-
-.group_2 {
+/* Phần thông tin */
+.infor {
+  color: #ffff33;
   display: flex;
   justify-content: space-around;
   align-items: center;
+  flex-wrap: wrap; /* Cho phép các phần tử linh hoạt chuyển dòng khi không đủ không gian */
 }
 
-
-.title_2 {
-  margin-bottom: 10px;
-  text-align: center;
-  font-size: 16px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-
-.button_get_2 {
-  padding: 12px 10px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  margin: 2px 2px 2px 2px;
-  transform: translateX(150%);
-}
-
-.button_get_2_1 {
-  padding: 12px 10px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  margin: 2px 2px 2px 12px;
-  transform: translateX(400%);
-}
-
-.button_get_22 {
-  display: flex;
-  justify-content: center;
-}
-
-.div_group_2 {
-  margin-left: 20px;
-  margin-bottom: 8px;
-}
-
-.get_number {
-  margin-bottom: 10px;
-}
-
-
-/*----- table ----*/
-
-
-.title_candidate_list {
-  font-size: 24px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-.div_table {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-}
-
-/*.div_table {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-}
-
-.table_fill {
-  display: table;
-  padding: 0 0 8em 0;
-  background: white;
-  border-radius: 3px;
-  border-collapse: collapse;
-  height: 350px;
-  max-width: 800px;
-  padding: 5px;
-  width: 100%;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  animation: float 5s infinite;
-}
-
-.th_table,
-.table_fill td {
-  padding-bottom: 2%;
-  padding-top: 2%;
-  padding-left: 2%;
-  font-weight: 500;
-  font-size: 1em;
-  text-align: left;
-  color:#A7A1AE;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #1F2739;
-}
-
-.table_fill tr:nth-child(odd) {
-  background-color: #323C50;
-}
-
-.table_fill tr:nth-child(even) {
-  background-color: #2C3446;
-}
-
-.table_fill td:first-child {
-  color: #FB667A;
-}
-
-
-.table_fill td {
-  .container td {
-    font-weight: normal;
-    font-size: 1em;
-    -webkit-box-shadow: 0 2px 2px -2px #0E1119;
-    -moz-box-shadow: 0 2px 2px -2px #0E1119;
-    box-shadow: 0 2px 2px -2px #0E1119;
-  }
-}*/
-
-.container {
-  color: #eee;
-  border-radius: 12px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.container th h1 {
-  font-weight: 500;
-  font-size: 1em;
-  text-align: left;
-  color: #185875;
-}
-
-.container td {
-  font-weight: normal;
-  font-size: 1em;
-  -webkit-box-shadow: 0 2px 2px -2px #0E1119;
-  -moz-box-shadow: 0 2px 2px -2px #0E1119;
-  box-shadow: 0 2px 2px -2px #0E1119;
-}
-
-.container {
-  text-align: center;
-  overflow: hidden;
-  width: 85%;
-  display: table;
-
-}
-
-.container td,
-.container th {
-  padding-bottom: 2%;
-  padding-top: 2%;
-  padding-left: 2%;
-  padding-right: 10px;
-}
-
-.container td:first-child,
-.container th:first-child {
-  padding-bottom: 2%;
-  padding-top: 2%;
-  padding-left: 2%;
-  padding-right: 30px;
-}
-
-/* Background-color of the odd rows */
-.container tr:nth-child(odd) {
-  background-color: #323C50;
-}
-
-/* Background-color of the even rows */
-.container tr:nth-child(even) {
-  background-color: #2C3446;
-}
-
-.container th {
-  background-color: #1F2739;
-}
-
-.container td:first-child {
-  color: #FB667A;
-}
-
-.container tr:hover {
-  background-color: #464A52;
-  -webkit-box-shadow: 0 6px 6px -6px #0E1119;
-  -moz-box-shadow: 0 6px 6px -6px #0E1119;
-  box-shadow: 0 6px 6px -6px #0E1119;
-}
-
-.container td:hover {
-  background-color: #FFF842;
-  color: #403E10;
-  font-weight: bold;
-
-  box-shadow: #7F7C21 -1px 1px, #7F7C21 -2px 2px, #7F7C21 -3px 3px, #7F7C21 -4px 4px, #7F7C21 -5px 5px, #7F7C21 -6px 6px;
-  transform: translate3d(6px, -6px, 0);
-
-  transition-delay: 0s;
-  transition-duration: 0.4s;
-  transition-property: all;
-  transition-timing-function: line;
-}
-
-.container td:last-child:hover {
-  /* Reset the shadow and transform properties for cells with class "no-hover" */
-  background-color: initial;
-  color: initial;
-  font-weight: initial;
-  box-shadow: none;
-  transform: none;
-  transition-delay: initial;
-  transition-duration: initial;
-  transition-property: initial;
-  transition-timing-function: initial;
-}
-
-/*-----search candidate----*/
-
-
-.search_candidate {
-  margin-left: 25px;
-  height: 294px;
-}
-
-.group_search {
-  display: flex;
-  justify-content: center;
-  transform: translateY(-100%);
-}
-
-.input_container {
-  height: 50px;
-  position: relative;
-  width: 100%;
-}
-
-.input {
-  background-color: #303245;
-  border-bottom-left-radius: 12px;
-  border-top-left-radius: 12px;
-  border: 0;
-  box-sizing: border-box;
-  color: #eee;
-  font-size: 18px;
-  height: 100%;
-  outline: 0;
-  padding: 0px 20px 0;
-  width: 100%;
-}
-
-.button_search {
-  width: 120px;
-  border-bottom-right-radius: 12px;
-  border-top-right-radius: 12px;
-  outline: 0;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  /* transform:
-    perspective(2750px)
-    translate3d(0px, 0px, 250px)
-    rotateX(27deg)
-    scale(0.9, 0.9); */
-}
-
-.button_search:hover {
-  background: #cdd884;
-  transform: translate3d(2px, 0px, 0);
-  transition-delay: 0s;
-  transition-duration: 0.4s;
-  transition-property: all;
-  transition-timing-function: line;
-}
-
-/*---notification not found----*/
-
-.no_candidate {
-  font-size: 18px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #f3edecc0;
-}
-
-/*------ result-------*/
-
-.result {
-  font-size: 22px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #FDFCFB;
-  line-height: 40px;
-}
-
-.title_candidate {
-  color: #D28B58;
-}
-
-/*------button--------*/
-
-.button_1 {
-  background-color: #289b33;
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
+/* Phần thông tin tài khoản và token */
+.account {
   height: 40px;
-  line-height: 20px;
-  list-style: none;
-  margin: 2px;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  margin-bottom: 10px;
+}
+
+.value{
+  margin-left: 5px;
+  color: white;
+}
+
+/* Nút và input */
+.buttonInput {
+  padding: 12px 20px; /* Tăng kích thước của nút */
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  margin: 10px 0;
+  transition: background-color 0.3s ease; /* Hiệu ứng chuyển đổi màu nền khi hover */
+}
+
+.buttonInput:hover {
+  background-color: #0056b3; /* Màu nền thay đổi khi hover */
+}
+
+.getnumber {
+  padding: 12px 20px; /* Tăng kích thước của input */
+  width: 300px;
+  border-radius: 50px;
+  border: 2px solid #ddd;
+  margin-right: 10px;
+}
+
+/* Danh sách token */
+.tokenList {
+  margin-bottom: 30px;
+}
+
+/* Tiêu đề của từng phần */
+.title {
+  margin-top: 10px;
+  text-align: left;
+  font-size: 24px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+}
+
+/* Phần ủy quyền LKK và thêm token */
+.approveLKK {
+  text-align: left;
+}
+
+/* bảng kết quả tìm kiếm */
+.tradeResults {
+  max-height: 300px; /* Đặt chiều cao tối đa */
+  overflow-y: auto; /* Hiển thị thanh cuộn dọc khi cần thiết */
+}
+
+.tradeResults table {
+  width: calc(100% - 10%);
+  margin: 0 auto; 
+  border-collapse: collapse; /* Gộp đường viền */
+}
+
+.tradeResults th,
+.tradeResults td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.tradeResults th {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+
+/* Bảng */
+.tableContainer {
+  overflow-x: auto; /* Cho phép cuộn ngang khi bảng quá rộng */
+  margin-bottom: 30px;
+}
+
+.tradeTable {
+  width: calc(100% - 10%);
+  margin: 0 auto; 
+  border-collapse: collapse; /* Gộp đường viền */
+}
+
+.tradeTable th,
+.tradeTable td {
+  padding: 10px;
+  border: 1px solid #ddd;
   text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
 }
 
-.button_1:hover,
-.button_1:focus {
-  background-color: #5ea53a;
+.tradeTable th {
+  background-color: #007bff;
+  color: #fff;
 }
 
+.tradeTable td button {
+  padding: 8px 12px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tradeTable td button:hover {
+  background-color: #0056b3;
+}
+
+.select {
+  padding: 10px; /* Kích thước padding */
+  font-size: 16px; /* Kích thước font chữ */
+  border: 1px solid #ccc; /* Đường viền */
+  border-radius: 5px; /* Bo góc */
+  width: 450px; /* Độ rộng */
+  outline: none; /* Loại bỏ đường viền khi được focus */
+  background-color: #00CCFF; /* Màu nền */
+  cursor: pointer; /* Con trỏ khi hover */
+}
+
+.select:hover {
+  background-color: #0056b3; /* Màu nền khi hover */
+}
+
+.select:disabled {
+  opacity: 0.5; /* Mờ khi bị vô hiệu hóa */
+}
 
 .button_2 {
-  background-color: #c13838;
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  height: 40px;
-  line-height: 20px;
-  list-style: none;
-  margin: 2px;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
+  padding: 12px 20px; /* Kích thước padding */
+  background-color: #007bff; /* Màu nền */
+  color: #fff; /* Màu chữ */
+  border: none; /* Không có đường viền */
+  border-radius: 5px; /* Bo góc */
+  cursor: pointer; /* Con trỏ khi hover */
 }
 
-.button_2:hover,
-.button_2:focus {
-  background-color: #b3554b;
+.button_2:hover {
+  background-color: #0056b3; /* Màu nền khi hover */
 }
 
-
-.button_3 {
-  background-color: #d6c421;
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  height: 40px;
-  line-height: 20px;
-  list-style: none;
-  margin: 2px;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
+.button_2:disabled {
+  opacity: 0.5; /* Mờ khi bị vô hiệu hóa */
 }
-
-.button_3:hover,
-.button_3:focus {
-  background-color: #d8d459;
-}
-
-
-/*------ add candidate -----*/
-
-.input_container_add {
-  height: 50px;
-  position: relative;
-  width: 150px;
-  margin: 2px;
-}
-
-
-
-.input_add {
-  background-color: #303245;
-  border-radius: 10px;
-  border: 0;
-  box-sizing: border-box;
-  color: #eee;
-  font-size: 18px;
-  height: 100%;
-  outline: 0;
-  padding: 4px 20px 0;
-  width: 100%;
-}
-
-.cut_1, .cut_2, .cut_3 {
-  border-radius: 10px;
-  height: 20px;
-  left: 20px;
-  position: absolute;
-  top: -20px;
-  transform: translateY(0);
-  transition: transform 200ms;
-}
-
-.cut_1{
-  width: 36px;
-}
-
-.cut_2{
-  width: 110px;
-}
-
-.cut_3{
-  width: 80px;
-}
-
-.input_add:focus~.cut_1,
-.input_add:not(:placeholder-shown)~.cut_1 {
-  transform: translateY(8px);
-  background-color: #1F2739;
-}
-
-.input_add:focus~.cut_2,
-.input_add:not(:placeholder-shown)~.cut_2 {
-  transform: translateY(8px);
-  background-color: #1F2739;
-}
-
-.input_add:focus~.cut_3,
-.input_add:not(:placeholder-shown)~.cut_3 {
-  transform: translateY(8px);
-  background-color: #1F2739;
-}
-
-.placeholder {
-  color: #65657b;
-  font-family: sans-serif;
-  left: 20px;
-  line-height: 14px;
-  pointer-events: none;
-  position: absolute;
-  transform-origin: 0 50%;
-  transition: transform 200ms, color 200ms;
-  top: 20px;
-}
-
-.input_add:focus~.placeholder,
-.input_add:not(:placeholder-shown)~.placeholder {
-  transform: translateY(-30px) translateX(10px) scale(0.75);
-}
-
-.input_add:not(:placeholder-shown)~.placeholder {
-  color: #808097;
-}
-
-.input_add:focus~.placeholder {
-  color: #dc2f55;
-}
-
-#input_1 {
-  width: 250px;
-}
-
-#input_2 {
-  width: 280px;
-}
-
-
-/*----- group add----*/
-
-.group_add {
-  display: flex;
-  align-items: center;
-  justify-content: start;
-}
-
-
-.button_add {
-  background-color: #227dba;
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  height: 40px;
-  line-height: 20px;
-  list-style: none;
-  margin: 2px;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  height: 50px;
-}
-
-.button_add:hover,
-.button_add:focus {
-  background-color: #4b7e91;
-}
-
-/*-----foot----*/
-
-.foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/*----- group button foot---*/
-
-.button_open {
-  background-image: linear-gradient(92.88deg, #455EB5 9.16%, #5643CC 43.89%, #673FD7 64.72%);
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  flex-shrink: 0;
-  font-family: "Inter UI","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  height: 4rem;
-  padding: 0 1.6rem;
-  text-align: center;
-  text-shadow: rgba(0, 0, 0, 0.25) 0 3px 8px;
-  transition: all .5s;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  margin-right: 10px;
-}
-
-.button_open:hover {
-  box-shadow: rgba(80, 63, 205, 0.5) 0 1px 30px;
-  transition-duration: .1s;
-}
-
-
-.button_withdraw {
-  background-image: linear-gradient(92.88deg, #4d9a8f 9.16%, #0e7264 43.89%, #48615e 64.72%);
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  flex-shrink: 0;
-  font-family: "Inter UI","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  height: 4rem;
-  padding: 0 1.6rem;
-  text-align: center;
-  text-shadow: rgba(0, 0, 0, 0.25) 0 3px 8px;
-  transition: all .5s;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  margin-right: 10px;
-}
-
-.button_withdraw:hover {
-  box-shadow: rgba(85, 146, 122, 0.5) 0 1px 30px;
-  transition-duration: .1s;
-}
-
-.input_update {
-  padding: 10px;
-  border: none;
-  outline: none;
-  margin: 4px 2px 4px 4px;
-  border-radius: 6px;
-}
-
-.button_update_1 {
-  background-color: #d0d270;
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  height: 38px;
-  line-height: 20px;
-  list-style: none;
-  margin: 2px;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
-
-
-.button_update_2 {
-  background-color: #e46262;
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  height: 38px;
-  line-height: 20px;
-  list-style: none;
-  margin: 2px;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
-
-
-.lich_su {
-  margin-left: 2px;
-  font-size: 20px;
-  text-decoration: underline;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.lich_su:hover {
-  color: #4d89bd;
-  cursor: pointer;
-}
-
-.center_vote{
-  text-align: center;
-}
-

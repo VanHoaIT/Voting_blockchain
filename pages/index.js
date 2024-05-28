@@ -1,43 +1,36 @@
 import { useEffect, useState } from 'react';
 import Web3 from 'web3';
-import * as Contract from '../service/service'
+import * as Contract from '../service/service';
+import Navbar from '../components/Navbar'; // Import Navbar component
 
-// import Navbar from '../components/Navbar';
 import styles from '../styles/MyComponent.module.css';
 
-import { useRouter } from 'next/router';
-import Navbar from '@/components/Navbar';
-
 const MyComponent = () => {
-  const [web3, setWeb3] = useState(null);
-  const [account, setAccount] = useState(null); //gán tài khoản đăng nhập 
-  const [contract, setContract] = useState(null); //gán hợp đồng tạo thành công
-  const [votingContract, setVotingContract] = useState(null); //gán hợp đồng tạo thành công Voting
-  const [balance, setBalance] = useState(null); //gán số dư đồng itoken
-  const [addressBTC, setaddressBTC ] = useState(null); //gán địa chỉ của BTC
-  const [recipient, setRecipient] = useState(''); //
-  const [amount, setAmount] = useState(''); //gán số 
   const [contractInitialized, setContractInitialized] = useState(false); //kiểm tra SC đã thực thi chưa
-  const [allowance, setallowance] = useState(null); // kiểm tra xem đã ủy quyền cho SC bao nhiêu
-  const [statusSC, setStatusSC ] = useState(); // trạng tháng của SC
+  const [web3, setWeb3] = useState(null);
+  const [account, setAccount] = useState(null); // Gán tài khoản đăng nhập 
+  const [LKKContract, setLKKContract] = useState(null); // Gán hợp đồng tạo thành công
+  const [exchangeContract, setExchangeContract] = useState(null); // Gán hợp đồng tạo thành công Exchange
+  const [balance, setBalance] = useState(null); // Thêm trạng thái balance để lưu số dư
+  const [approveLKKAmount, setApproveLKKAmount] = useState(''); // Số lượng token LKK cần ủy quyền
+  const [tokenAddressInput, setTokenAddressInput] = useState(''); // Trường nhập liệu cho địa chỉ token muốn thêm vào
+  const [tokenList, setTokenList] = useState([]); //danh sách token
+  const [tokenPrices, setTokenPrices] = useState({}); //giá các token
+  const [priceInput, setPriceInput] = useState(''); // Trường nhập liệu cho giá token
+  const [owner, setOwner] = useState(null);//gán giá trị người triển khai
+  const [approveAmounts, setApproveAmounts] = useState({}); //ủy quyền
+  const [tradeAmount, setTradeAmount] = useState(''); //số lượng bán
+  const [selectedToken, setSelectedToken] = useState(''); //loại token bán
+  const [tokenBalances, setTokenBalances] = useState({}); //cập nhật số dư của token đã chọn để bánc  
+  const [trades, setTrades] = useState([]);//danh sách các gói bán
+  const [tradeHistory, setTradeHistory] = useState([]); //lịch sử các gói trao đổi
 
-  const [candidateId, setCandidateId] = useState('');//các tham số thêm ứng viên
-  const [candidateName, setCandidateName] = useState('');
-  const [candidateDescription, setCandidateDescription] = useState('');
-
-  const [candidates, setCandidates] = useState([]);//danh sách ứng viên
-  const [nameSC, setNameSC ] = useState(null); // tên cuộc bình chọn
-
-  const [updatingCandidateId, setUpdatingCandidateId] = useState(null);//update
-  const [newName, setNewName] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-
-  const [searchValue, setSearchValue] = useState(''); // Tìm kiếm
-  const [searchResult, setSearchResult] = useState(null);
-  const [notFound, setNotFound] = useState(false);// thông báo tìm thấy ứng viên hay không
-
-  const [showBTCInfo, setShowBTCInfo] = useState(false); //kiểm tra xem phải btc khong
-
+  const [tradeResults, setTradeResults] = useState({
+    tradeIds: [],
+    sellers: [],
+    tokenAmounts: [],
+    lkkPrices: []
+  });
 
   useEffect(() => {
     const loadWeb3 = async () => {
@@ -53,16 +46,16 @@ const MyComponent = () => {
           const accounts = await web3Instance.eth.getAccounts();
           setAccount(accounts[0]); // Lấy tài khoản đầu tiên
 
-          // Khởi tạo instance của Itoken
-          const myContract = new web3Instance.eth.Contract(Contract.ItokenABI, Contract.ItokenAddress, Contract.VotingABI, Contract.VotingAddress);
-          setContract(myContract);
+          // Khởi tạo instance của LKK token
+          const LKKContractInstance = new web3Instance.eth.Contract(Contract.ERC20ABI, Contract.LKKAddress);
+          setLKKContract(LKKContractInstance);
 
-          // Khởi tạo instance của Voting
-          const votingContractInstance = new web3Instance.eth.Contract(Contract.VotingABI, Contract.VotingAddress);
-          setVotingContract(votingContractInstance);
+          // Khởi tạo instance của Exchange
+          const ExchangeContractInstance = new web3Instance.eth.Contract(Contract.ExchangeABI, Contract.ExchangeAddress);
+          setExchangeContract(ExchangeContractInstance);
 
-        // xác nhận SC đã được thực thi
-        setContractInitialized(true);
+          // xác nhận SC đã được thực thi
+          setContractInitialized(true);
 
         } catch (error) {
           console.error(error);
@@ -75,566 +68,430 @@ const MyComponent = () => {
   // useEffect để gọi các hàm sau khi contract đã được thiết lập
   useEffect(() => {
     if (contractInitialized) {
-      getAddressBTC();
-      statusSmartContract();
-      getCandidateList();
       handleGetBalance();
-      handleAllowance();
+      getTokenList();
+      fetchOwner(); 
     }
   }, [contractInitialized]);
 
-  useEffect(() => {
-    // Kiểm tra xem address từ Metamask có phải là addressBTC không
-    setShowBTCInfo(account === addressBTC);
-  }, [account, addressBTC]);
-
-  const setContentNameSC = async () => {
-    if (account !== addressBTC) {
-      alert("Chỉ địa chỉ BTC mới có thể thực hiện");
-      return;
-    }
-    try {
-      // Gọi hàm setContestName từ smart Votingcontract
-      const result = await votingContract.methods.setContestName(nameSC).send({from: account });
-      setNameSC(result.toString());
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+  //hàm gọi lấy số dư LKK
   const handleGetBalance = async () => {
     try {
-      // Gọi hàm balanceOf từ smart contract
-      const result = await contract.methods.balanceOf(account).call();
-      // gán kết quả vào
-      setBalance(result.toString());
+      const result = await LKKContract.methods.balanceOf(account).call();
+      setBalance(result.toString());   
     } catch (error) {
       console.error(error);
     }
   };
 
-  const getAddressBTC = async () => {
+  //ủy quyền đồng trung gian LKK
+  const handleApproveLKK = async () => {
     try {
-      // Gọi hàm symbol từ smart contract
-      const result = await votingContract.methods.addressBTC().call();
-      setaddressBTC(result);
+      await LKKContract.methods.approve(Contract.ExchangeAddress, approveLKKAmount).send({ from: account });
+      alert('Đã ủy quyền thành công cho LKK');
     } catch (error) {
-      console.error(error);
+      console.error("Error approving LKK token:", error);
+    }
+  };
+  
+  const handleAddToken = async () => {
+    try {
+      // Gọi phương thức addToken từ hợp đồng Exchange với địa chỉ token từ trường nhập liệu
+      await exchangeContract.methods.addToken(tokenAddressInput).send({ from: account });
+      alert(`Đã thêm thành công token vào sàn`);
+      getTokenList(); // cập nhật danh sách token sau khi thêm thành công
+    } catch (error) {
+      console.error("Error adding token:", error);
     }
   };
 
-  const openVoting = async () => {
-    if (account !== addressBTC) {
-      alert("Chỉ địa chỉ BTC mới có thể thực hiện");
+  //danh sách các token đã thêm vào
+  const getTokenList = async () => {
+    try {
+        const tokens = await exchangeContract.methods.getTokenList().call();
+        setTokenList(tokens);
+        getTokensPrice(tokens); // Cập nhật giá của các token
+    } catch (error) {
+        console.error('Error getting token list:', error);
+    }
+  };
+  //xác định địa chỉ người triển khai
+  const fetchOwner = async () => {
+    try {
+      const ownerAddress = await exchangeContract.methods.owner().call();
+      setOwner(ownerAddress);
+    } catch (error) {
+      console.error('Error fetching owner:', error);
+    }
+  };
+  
+  //gọi hàm lấy giá trị của token
+  const getTokensPrice = async (tokens) => {
+    try {
+      const prices = {};
+      for (let token of tokens) {
+        const price = await exchangeContract.methods.getTokenPrice(token).call();
+        prices[token] = price;
+      }
+      setTokenPrices(prices);
+    } catch (error) {
+      console.error('Error getting token prices:', error);
+    }
+  };
+
+   // Hàm để định giá token
+  const handleSetTokenPrice = async (tokenAddress) => {
+    if (account !== owner) {
+      alert('Bạn không có quyền thực hiện hành động này.');
       return;
     }
     try {
-      // Thực hiện gọi hàm mở Votingcontract
-      await votingContract.methods.openVoting().send({ from: account });
-      setStatusSC(true);
-      alert("Cuộc bình chọn đã mở");
-      // Xử lý các hành động sau khi mở bỏ phiếu thành công
+      await exchangeContract.methods.setTokenPrice(tokenAddress, priceInput).send({ from: account });
+      alert(`Đã đặt giá token thành công`);
+      getTokenList(); // Cập nhật giá token sau khi đặt
     } catch (error) {
-      console.error(error);
-      // Xử lý các hành động khi có lỗi xảy ra
+      console.error("Error setting token price:", error);
     }
   };
 
-  const closeVoting = async () => {
-    if (account !== addressBTC) {
-      alert("Chỉ địa chỉ BTC mới có thể thực hiện");
-      return;
-    }
+  //ủy quyền theo token
+  const handleApproveToken = async (tokenAddress, amount) => {
     try {
-      // Thực hiện gọi hàm đóng trên Votingcontract
-      await votingContract.methods.closeVoting().send({ from: account });
-      setStatusSC(false);
-      alert("Cuộc bình chọn đã đóng");
-      // Xử lý các hành động sau khi mở bỏ phiếu thành công
+      const tokenContract = new web3.eth.Contract(Contract.ERC20ABI, tokenAddress);
+      await tokenContract.methods.approve(Contract.ExchangeAddress, amount).send({ from: account });
+      alert('Đã ủy quyền thành công');
     } catch (error) {
-      console.error(error);
-      // Xử lý các hành động khi có lỗi xảy ra
+      console.error("Error approving token:", error);
     }
   };
 
-  // trạng thái của smartcontract
-  const statusSmartContract = async () => {
-    try {
-      // Gọi hàm votingOpen từ smart contract và cập nhật state
-      const status = await votingContract.methods.votingOpen().call();
-      setStatusSC(status);
-      
-    } catch (error) {
-      console.error(error);
+  //cập nhật số lượng token kiểm tra tr khi bán
+  const updateTokenBalances = async (tokens) => {
+    const balances = {};
+    for (let token of tokens) {
+      const tokenContract = new web3.eth.Contract(Contract.ERC20ABI, token);
+      const balance = await tokenContract.methods.balanceOf(account).call();
+      balances[token] = balance;
     }
-  }
-
-  //kiểm tra trạng thái gọi hàm thích hơp
-  const OpenOrCloseSC = async () => {
-    if (statusSC) {
-      closeVoting(); // Gọi hàm closeVoting nếu statusSC là true
-    } else {
-      openVoting(); // Gọi hàm openVoting nếu statusSC là false
+    setTokenBalances(balances);
+  };
+  
+  useEffect(() => {
+    if (tokenList.length > 0) {
+      updateTokenBalances(tokenList);
     }
-  }
-
-  //số token đã ủy quyền cho VotingContract
-  const handleAllowance = async () => {
+  }, [tokenList, account]);
+  
+  const handleCreateTrade = async () => {
     try {
-      // Sử dụng hàm approve từ smart contract
-      const result = await contract.methods.allowance(account, Contract.VotingAddress).call();
-      setallowance(result.toString());
+      if (!selectedToken || !tradeAmount) {
+        alert('Vui lòng chọn token hoặc nhập số lượng để bán');
+        return;
+      }
+      if (parseFloat(tradeAmount) > parseFloat(tokenBalances[selectedToken] || '0')) {
+        alert('Bạn không đủ token để bán');
+        return;
+      }
+      await exchangeContract.methods.createTrade(selectedToken, tradeAmount).send({ from: account });
+      alert(`Đã tạo gói bán ${tradeAmount} token: ${selectedToken}`);
     } catch (error) {
-      console.error(error);
+      console.error("Error creating trade:", error);
     }
   };
 
-  //chuyển token
-  const handleTransfer = async () => {
+  useEffect(() => {
+    const fetchTrades = async () => {
+      try {
+        const result = await exchangeContract.methods.getTrades().call();
+        // Chuyển đổi các giá trị từ số nguyên sang chuỗi trước khi set state
+        const formattedTrades = {
+          tradeIds: result.tradeIds.map(id => id.toString()),
+          sellers: result.sellers.map(seller => seller.toString()),
+          tokenAmounts: result.tokenAmounts.map(amount => amount.toString()),
+          lkkPrices: result.lkkPrices.map(price => price.toString()),
+          tokenAddresses: result.tokenAddresses.map(address => address.toString())
+        };
+        setTrades(formattedTrades);
+      } catch (error) {
+        console.error('Error fetching trades:', error);
+      }
+    };
+
+    const fetchTradeHistory = async () => {
+      if (exchangeContract) {
+        try {
+          const result = await exchangeContract.methods.getTradeHistory().call();
+          const formattedHistory = result.buyers.map((buyer, index) => ({
+            buyer: buyer,
+            seller: result.sellers[index],
+            tokenAmount: result.tokenAmounts[index].toString(),
+            lkkPrice: result.lkkPrices[index].toString(),
+            tokenAddress: result.tokenAddresses[index],
+            timestamp: new Date(Number(result.timestamps[index]) * 1000).toLocaleString(),
+          }));
+          setTradeHistory(formattedHistory);
+        } catch (error) {
+          console.error('Error fetching trade history:', error);
+        }
+      }
+    };
+
+    if (exchangeContract) {
+        fetchTrades();
+        fetchTradeHistory();
+      }
+    }, [exchangeContract]);
+
+  //mua các gói
+  const handleBuyTrade = async (tradeId) => {
     try {
-      await contract.methods.transfer(recipient, amount).send({ from: account });
-      setBalance(balance - amount);
-      alert(`Đã chuyển thành công ${amount} tokens  Cho địa chỉ ${recipient}`);
-      handleGetBalance();
+      await exchangeContract.methods.buyTrade(tradeId).send({ from: account });
+      alert(`Trade with ID ${tradeId} bought successfully`);
+
+      // Sau khi mua thành công, cập nhật lại danh sách giao dịch
+      const updatedTrades = trades.filter(trade => trade.tradeId !== tradeId);
+      setTrades(updatedTrades);
     } catch (error) {
-      console.error(error);
+      console.error(`Error buying trade with ID ${tradeId}:`, error);
     }
   };
 
-  //ủy quyền
-  const handleApprove = async () => {
+  // Hàm hủy gói bán
+  const cancelTrade = async (tradeId) => {
     try {
-      // Sử dụng hàm approve từ smart contract
-      await contract.methods.approve(Contract.VotingAddress, amount).send({ from: account });
-      alert(`Đã ủy quyền thành công ${amount} tokens cho Hợp đồng Voting ${votingAddress}`);
-      handleAllowance();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleAddCandidate = async () => {
-    if (account !== addressBTC) {
-      alert("Chỉ địa chỉ BTC mới có thể thực hiện");
-      return;
-    }
-    try {
-      // Kiểm tra xem contract đã được khởi tạo chưa
-      if (!contract) {
-        console.error('Contract is not initialized.');
+      // Kiểm tra xem người dùng có phải là người bán không
+      if (trades.sellers[tradeId] !== account) {
+        alert('Bạn không có quyền hủy gói bán này.');
         return;
       }
 
-      // Gọi hàm addCandidate từ smart contract
-      await votingContract.methods
-        .addCandidate(candidateId, candidateName, candidateDescription)
-        .send({ from: account }); //
-
-      // Hiển thị thông báo thành công nếu gọi hàm thành công
-      alert('Đã thêm ứng viên thành công');
-      await getCandidateList();
+      await exchangeContract.methods.cancelTrade(tradeId).send({ from: account });
+      alert(`Trade with ID ${tradeId} cancelled successfully`);
+      // Sau khi hủy thành công, cập nhật lại danh sách giao dịch
+      const updatedTrades = trades.filter(trade => trade.tradeId !== tradeId);
+      setTrades(updatedTrades);
     } catch (error) {
-      console.error(error);
-      // Hiển thị thông báo lỗi nếu có lỗi xảy ra
-      alert('Đã bỏ trống hoặc nhập chưa đúng');
+      console.error(`Error cancelling trade with ID ${tradeId}:`, error);
     }
-  };
-
-  //hiển thị danh sách các ứng viên được vote
-  const getCandidateList = async () => {
-    try {
-      // Gọi hàm getCandidateList từ smart contract
-      const result = await votingContract.methods.getCandidateList().call();
-
-      // gán kết quả
-      const ids = result[0].map(id => id.toString());
-      const names = result[1];
-      const numVotes = result[2].map(id => id.toString());
-
-      // Tạo danh sách các ứng viên từ dữ liệu nhận được
-      const candidateList = ids.map((id, index) => ({
-        id,
-        name: names[index],
-        numVotes: numVotes[index]
-      }));
-
-      // Cập nhật state để render lại giao diện
-      setCandidates(candidateList);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleVote = async (candidateId) => {
-    // Kiểm tra trạng thái của cuộc bầu cử
-    const votingOpen = await votingContract.methods.votingOpen().call();
-    if (!votingOpen) {
-      // Thông báo nếu cuộc bầu cử đã đóng
-      alert("Cuộc bình chọn đã đóng");
-      return;
-    }
-
-    try {
-        await votingContract.methods.vote(candidateId).send({ from: account });
-        // Thực hiện các hành động cần thiết sau khi bỏ phiếu thành công
-        alert(`Đã vote thành công ứng viên ID = ${candidateId}`);
-        getCandidateList();
-        handleAllowance();
-        handleGetBalance();
-    } catch (error) {
-      // Xử lý các lỗi nếu có
-      console.error("Vote error:", error);
-    }
-  };
-
-  //xóa ứng viên
-  const removeCandidate = async (candidateId) => {
-    if (account !== addressBTC) {
-      alert("Chỉ địa chỉ BTC mới có thể thực hiện");
-      return;
-    }
-    try {
-      //gọi hàm removeCandidate để xóa ứng viên theo ID
-      await votingContract.methods.removeCandidate(candidateId).send({ from: account });
-      console.log(`Candidate with ID ${candidateId} removed successfully.`);
-      // Tải lại danh sách ứng viên sau khi xóa
-      await getCandidateList();
-      alert('Đã xóa thành công')
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  
-  // Hàm "Update"
-  const handleUpdateCandidate = async () => {
-    if (account !== addressBTC) {
-      alert("Chỉ địa chỉ BTC mới có thể thực hiện");
-      return;
-    }
-    try {
-      // Kiểm tra xem có đang cập nhật ứng viên nào không
-      if (updatingCandidateId !== null && newName !== '' && newDescription !== '') {
-        // Gọi hàm updateCandidate với thông tin mới
-        await votingContract.methods.updateCandidate(updatingCandidateId, newName, newDescription).send({ from: account });
-        // Sau khi cập nhật thành công, cập nhật lại danh sách ứng viên
-        await getCandidateList();
-        alert("Đã cập nhật thành công ứng viên")
-        // Đặt updatingCandidateId về null để kết thúc quá trình cập nhật
-        setUpdatingCandidateId(null);
-        setNewName('');
-        setNewDescription('');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // Hàm xử lý khi nhấn nút "Cancel"
-  const handleCancelUpdate = () => {
-    setUpdatingCandidateId(null);
-    setNewName('');
-    setNewDescription('');
   };
 
   //tìm kiếm
-  const searchCandidate = async (searchValue) => {
+  const findTradesByToken = async () => {
     try {
-      // Kiểm tra xem searchValue là số hay chuỗi
-      const isId = !isNaN(searchValue);
-      let candidateInfo;
-  
-      if (isId) {
-        // Nếu searchValue là số, tìm kiếm ứng viên bằng ID
-        candidateInfo = await votingContract.methods.candidates(searchValue).call();
-      } else {
-        // Nếu searchValue là chuỗi, tìm kiếm ứng viên bằng tên
-        // Lặp qua danh sách ứng viên để tìm ứng viên có tên tương ứng
-        for (let i = 0; i < candidates.length; i++) {
-          if (candidates[i].name.toLowerCase() === searchValue.toLowerCase()) {
-            // Nếu tìm thấy ứng viên, lấy thông tin của ứng viên
-            candidateInfo = await votingContract.methods.candidates(candidates[i].id).call();
-            break;
-          }
-        }
-      }
-  
-      // Xử lý kết quả tìm kiếm
-      if (candidateInfo) {
-        // Hiển thị thông tin của ứng viên được tìm thấy
-        console.log('Found candidate:', candidateInfo);
-        //chuyển uint256 về dạng chuỗi để hiển thị
-        const candidateInfoString = {
-          id: candidateInfo.id.toString(),
-          name: candidateInfo.name,
-          description: candidateInfo.description,
-          numVote: candidateInfo.numVote.toString()
-        };
-        setSearchResult(candidateInfoString);
-        setNotFound(false);
-      } else {
-        // Nếu không tìm thấy ứng viên, thông báo cho người dùng
-        console.log('Candidate not found');
-        setNotFound(true);
-      }
+      const result = await exchangeContract.methods.findTradesByToken(tokenAddressInput).call();
+      const formattedResults = {
+        tradeIds: result.tradeIds.map(id => id.toString()),
+        sellers: result.sellers.map(seller => seller.toString()),
+        tokenAmounts: result.tokenAmounts.map(amount => amount.toString()),
+        lkkPrices: result.lkkPrices.map(price => price.toString())
+      };
+      setTradeResults(formattedResults);
     } catch (error) {
-      console.error(error);
+      console.error('Error finding trades by token:', error);
     }
   };
-  
-  //thu hồi itoken từ SC về BTC
-  const withdrawToken = async () => {
-    if (account !== addressBTC) {
-      alert("Chỉ địa chỉ BTC mới có thể thực hiện");
-      return;
-    }
-    try {
-      await votingContract.methods.withdrawToken().send({ from: account });
-      alert("Đã thu hồi thành công");
-    } catch (error) {
-      console.error("Withdrawal error:", error);
-      alert("Withdrawal failed. Please try again later.");
-    }
-  };
-  
 
   return (
-    <div className={styles.myComponent}>
+    <div className={styles.MyComponent}>
+      <Navbar userAddress={account}/>
+      <h1 className={styles.welcom}>Welcome to the Exchange Platform</h1>
 
-      <h1 className={styles.title_hh}>Cuộc thi {nameSC}</h1>
-
-
-
-      <div className={styles.currentAccount}><p><b>Địa chỉ hiện tại:</b></p> <p className={styles.value}>{account}</p></div>
-      <div className={styles.currentAccount}><p><b>Token đang có:</b></p> <p className={styles.value}>{balance} ITK</p></div>
-      <div className={styles.currentAccount}><p><b>Token đã uỷ quyền:</b></p> <p className={styles.value}>{allowance} ITK</p></div>
-
-      <div className={styles.group_2}>
+      <div className={styles.infor}>
         <div>
-          <h5 className={styles.title_2}>Uỷ quyền</h5>
-          <div className={styles.get_number}>
-            <input
-              className={styles.input_get_number}
-              type="number"
-              placeholder="Số lượng"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-          </div>
-          <button className={styles.button_get_2} onClick={handleApprove} disabled={!amount}>
-            Ủy quyền
-          </button>
-        </div>
-
-
-        <div>
-          <h5 className={styles.title_2}>Chuyển token</h5>
-          <div className={styles.div_group_2}>
-            <input
-              className={styles.input_get_text}
-              type="text"
-              placeholder="Địa chỉ đến"
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-            />
-            <input
-              className={styles.input_get_number}
-              type="number"
-              placeholder="Số lượng"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-          </div>
-          <div className={styles.button_get_22}>
-            <button className={styles.button_get} onClick={handleTransfer} disabled={!recipient || !amount}>
-              Chuyển
-            </button>
-          </div>
-        </div>
-      </div>
-
-
-
-      {/*<p>Voting Status: {statusSC ? 'Open' : 'Closed'}</p>*/}
-
-      <div>
-        <h2 className={styles.title_candidate_list}>Danh sách ứng viên</h2>
-        <div className={styles.div_table}>
-          <table className={styles.container}>
-            <thead>
-              {/* className={styles.th_table}*/}
-              <tr className={styles.head}>
-                <th>ID</th>
-                <th>Tên ứng viên</th>
-                <th>Số lượng bình chọn</th>
-                <th>Tùy chọn</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                candidates.map(candidate => (
-                  <tr>
-                    <td data-title="ID">{candidate.id}</td>
-                    <td data-title="Name">{candidate.name}</td>
-                    <td data-title="Link" className={styles.center_vote}>{candidate.numVotes}</td>
-                    <td data-title="Status">
-                      <button className={styles.button_1} onClick={() => handleVote(candidate.id)}>Bình chọn</button>
-                      <button className={styles.button_2} onClick={() => removeCandidate(candidate.id)}>Xoá ứng viên</button>
-                      {updatingCandidateId === candidate.id ? (
-                        <div>
-                          <input className={styles.input_update} type="text" placeholder="Tên mới" value={newName} onChange={e => setNewName(e.target.value)} />
-                          <input className={styles.input_update} type="text" placeholder="Mô tả mới" value={newDescription} onChange={e => setNewDescription(e.target.value)} />
-                          <button className={styles.button_update_1} onClick={handleUpdateCandidate}>Update</button>
-                          <button className={styles.button_update_2} onClick={handleCancelUpdate}>Cancel</button>
-                        </div>
-                      ) : (
-                        <button className={styles.button_3} onClick={() => setUpdatingCandidateId(candidate.id)}>Cập nhật</button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-
-          <div className={styles.container_search}>
-            <div className={styles.search_candidate}>
-              <div className={styles.group_search}>
-                <div className={styles.input_container}>
-                  <input
-                    type="text"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    className={styles.input}
-                    placeholder='Nhập id hoặc tên ứng viên'
-                  />
-                </div>
-                <button
-                  onClick={() => searchCandidate(searchValue)}
-                  className={styles.button_search}
-                >
-                  Tìm kiếm
-                </button>
-              </div>
-
-              {notFound ? (
-                <p className={styles.no_candidate}>Không tìm thấy ứng viên!</p>
-              ) : searchResult ? (
-                <div className={styles.result}>
-                  {/* <h2>Search Result</h2> */}
-                  <p><b className={styles.title_candidate}>ID:</b> {searchResult.id}</p>
-                  <p><b className={styles.title_candidate}>Tên ứng viên:</b> {searchResult.name}</p>
-                  <p><b className={styles.title_candidate}>Mô tả:</b> {searchResult.description}</p>
-                  <p><b className={styles.title_candidate}>Số lượt bình chọn:</b> {searchResult.numVote}</p>
-                </div>
-              ) : null}
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.lich_su}>
-        <p>
-          <a href='https://baobab.klaytnscope.com/account/0x162668bEfDD2ff85F7305cCAa660E0fC36c9131C?tabId=txList' target='_blank'>Lịch sử bình chọn</a>
-        </p>
-      </div>
-
-
-      <div className={styles.foot}>
-        <div>
-          {showBTCInfo && (
-            <div>
-              <div>
-                {(
-                  <div className={styles.group_1}>
-                    <div className={styles.input_container_name}>
-                      <input
-                        className={styles.input_name}
-                        type="text"
-                        placeholder="Tên cuộc thi"
-                        onChange={(e) => setNameSC(e.target.value)}
-                      />
-                    </div>
-                    <button className={styles.button_name} onClick={() => setContentNameSC(nameSC)}>
-                    Đặt tên
-                    </button>
-                  </div>
-                )}
-              </div>
-    
-              <div className={styles.group_add}>
-                {/* <h1>Add Candidate</h1> */}
-                {/* <label>Candidate ID:</label> */}
-                <div className={styles.input_container_add}>
-                  <input
-                    className={styles.input_add}
-                    type="text"
-                    value={candidateId}
-                    onChange={(e) => setCandidateId(e.target.value)}
-                    placeholder=' '
-                  />
-                  <div className={styles.cut_1}></div>
-                  <label for="ID" className={styles.placeholder}>ID</label>
-                </div>
-                {/* <label>Candidate Name:</label> */}
-                <div className={styles.input_container_add} id={styles.input_1}>
-                  <input
-                    className={styles.input_add}
-                    type="text"
-                    value={candidateName}
-                    onChange={(e) => setCandidateName(e.target.value)}
-                    placeholder=' '
-                  />
-                  <div className={styles.cut_2}></div>
-                  <label for="Name" className={styles.placeholder}>Tên ứng viên</label>
-                </div>
-                {/* <label>Candidate Description:</label> */}
-                <div className={styles.input_container_add} id={styles.input_2}>
-                  <input
-                    className={styles.input_add}
-                    type="text"
-                    value={candidateDescription}
-                    onChange={(e) => setCandidateDescription(e.target.value)}
-                    placeholder=' '
-                  />
-                  <div className={styles.cut_3}></div>
-                  <label for="Description" className={styles.placeholder}>Mô tả</label>
-                </div>
-                <button button className={styles.button_add} onClick={handleAddCandidate}>Thêm ứng viên</button>
-              </div>
-    
-            </div>
-          )}
-        </div>
-
-        <div>
-          {showBTCInfo && (
-            <div>          
-              <button
-                className={styles.button_open}
-                onClick={OpenOrCloseSC} // Gọi hàm handleVotingAction khi nhấn nút
-                style={{ backgroundColor: statusSC ? 'green' : 'blue' }} // Áp dụng màu và kiểu con trỏ tùy thuộc vào giá trị của statusSC
-              >
-                {statusSC ? 'Đóng' : 'Mở'} cuộc bình chọn
-              </button>
-    
-              <button
-                className={styles.button_withdraw}
-                onClick={withdrawToken}
-                style={{ backgroundColor: 'blue', cursor: 'pointer' }}
-              >
-                Thu hồi token
-              </button>
-            </div>
-          )}
+          <div className={styles.account}><p><b>Địa chỉ ví:</b></p> <p className={styles.value}>{account}</p></div>
+          <div className={styles.account}><p><b>Địa chỉ token LKK:</b></p> <p className={styles.value}>{LKKContract ? LKKContract.options.address : "Loading..."} </p></div>
+          <div className={styles.account}><p><b>Địa chỉ sàn giao dịch:</b></p> <p className={styles.value}>{exchangeContract ? exchangeContract.options.address : "Loading..."}</p></div>
+          <div className={styles.account}><p><b>Token LKK hiện có:</b></p> <p className={styles.value}>{balance} LKK</p></div>
         </div>
         
+        <div>
+          <div className={styles.approveLKK}>
+            <h2 className={styles.title}>Approve LKK Token:</h2>
+            <input className={styles.getnumber}
+              type="number"
+              placeholder="Enter Amount"
+              value={approveLKKAmount}
+              onChange={(e) => setApproveLKKAmount(e.target.value)}
+            />
+            <button className={styles.buttonInput} onClick={handleApproveLKK}>
+              Approve LKK
+            </button>
+          </div>
+
+          <div className={styles.approveLKK}>
+            <h2 className={styles.title}>Add token:</h2>
+            <input className={styles.getnumber}
+              type="text" 
+              placeholder="Enter Token Address" 
+              value={tokenAddressInput} 
+              onChange={(e) => setTokenAddressInput(e.target.value)} 
+            />
+            <button className={styles.buttonInput}  onClick={handleAddToken}>Add Token</button>
+          </div>
+        </div>
+      </div>
+
+      
+      <div className={styles.tokenList}>
+        <h2 className={styles.title}>Token List:</h2>
+        <ul>
+          {tokenList.map((token, index) => (
+            <li key={index}>
+              {`${token}: ${tokenPrices[token] ? parseFloat(tokenPrices[token]).toFixed(1) : 'Chưa được định giá'}`}
+              <input className={styles.getnumber}
+                type="number"
+                placeholder="Enter Price"
+                value={priceInput}
+                onChange={(e) => {
+                  setPriceInput(e.target.value)
+                }}
+              />
+              <button className={styles.buttonInput} onClick={() => handleSetTokenPrice(token, tokenPrices[token])}>
+                Set Price
+              </button>
+              <input
+                type="number" className={styles.getnumber}
+                placeholder="Enter Amount"
+                value={approveAmounts[token] || ''}
+                onChange={(e) => {
+                  const newApproveAmounts = { ...approveAmounts };
+                  newApproveAmounts[token] = e.target.value;
+                  setApproveAmounts(newApproveAmounts);
+                }}
+              />
+              <button className={styles.buttonInput} onClick={() => handleApproveToken(token, approveAmounts[token])}>
+                Approve
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div >
+        <h2 className={styles.title}>Find Trades by Token</h2>
+        <select className={styles.select} onChange={(e) => setTokenAddressInput(e.target.value)} value={tokenAddressInput}>
+          <option value="" disabled>Select Token</option>
+          {tokenList.map((token, index) => (
+            <option key={index} value={token}>{token}</option>
+          ))}
+        </select>
+        <button className={styles.button_2} onClick={findTradesByToken}>Find Trades by Token</button>
+        <div className={styles.tradeResults}>
+          <h2 className={styles.title}>Trade Results</h2>
+          <div >
+            <table>
+              <thead>
+                <tr>
+                  <th>Trade ID</th>
+                  <th>Seller</th>
+                  <th>Token Amount</th>
+                  <th>LKK Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tradeResults.tradeIds.map((tradeId, index) => (
+                  <tr key={index}>
+                    <td>{tradeId}</td>
+                    <td>{tradeResults.sellers[index]}</td>
+                    <td>{tradeResults.tokenAmounts[index]}</td>
+                    <td>{tradeResults.lkkPrices[index]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <div>
+        <h2 className={styles.title}>Create Trade</h2>
+        <select className={styles.select} onChange={(e) => setSelectedToken(e.target.value)} value={selectedToken}>
+          <option value="" disabled>Select Token</option>
+          {tokenList.map((token, index) => (
+            <option key={index} value={token}>
+              {token}
+            </option>
+          ))}
+        </select>
+        <input className={styles.getnumber}
+          type="number"
+          placeholder="Enter Amount"
+          value={tradeAmount}
+          onChange={(e) => setTradeAmount(e.target.value)}
+        />
+        <button className={styles.button_2} onClick={handleCreateTrade}>
+          Create Trade
+        </button>
+      </div>
+
+
+      <div className={styles.tableContainer}>
+        <h2 className={styles.title}>List Trades</h2>
+        <table className={styles.tradeTable}>
+          <thead>
+            <tr>
+              <th>Trade ID</th>
+              <th>Seller</th>
+              <th>Token Address</th>
+              <th>Token Amount</th>
+              <th>LKK Price</th>
+              <th>Bán</th>
+              <th>Hủy</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(trades.tradeIds) && trades.tradeIds.length > 0 ? (
+              trades.tradeIds.map((tradeId, index) => (
+                <tr key={tradeId}>
+                  <td>{tradeId}</td>
+                  <td>{trades.sellers[index]}</td>
+                  <td>{trades.tokenAddresses[index]}</td>
+                  <td>{trades.tokenAmounts[index]}</td>
+                  <td>{trades.lkkPrices[index]}</td>
+                  <td><button onClick={() => handleBuyTrade(tradeId)}>Buy Trade</button></td>
+                  <td><button onClick={() => cancelTrade(tradeId)}>Cancel Trade</button></td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5">No trades available</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className={styles.tableContainer}>
+        <h2 className={styles.title}>History Trades</h2>
+        <table className={styles.tradeTable}>
+          <thead>
+            <tr>
+              <th>Buyer</th>
+              <th>Seller</th>
+              <th>Token Amount</th>
+              <th>LKK Price</th>
+              <th>Token Address</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tradeHistory.map((trade, index) => (
+                <tr key={index}>
+                  <td>{trade.buyer}</td>
+                  <td>{trade.seller}</td>
+                  <td>{trade.tokenAmount}</td>
+                  <td>{trade.lkkPrice}</td>
+                  <td>{trade.tokenAddress}</td>
+                  <td>{trade.timestamp}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </div>
 
     </div>
-
   );
-};
+}
 
 export default MyComponent;
-

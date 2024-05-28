@@ -1,0 +1,39 @@
+/* Navbar.module.css */
+.navbar {
+    background-color: #00668ef9;
+    color: #fff;
+    padding: 10px;
+    display: flex; /* Sử dụng flexbox để căn giữa phần trái và phải */
+    justify-content: space-between; /* Căn phần trái và phải cách nhau */
+  }
+  
+  .left {
+    display: flex;
+    align-items: center; /* Căn đối với trục dọc */
+  }
+  
+  .left p {
+    margin: 0;
+    padding-right: 10px; /* Khoảng cách giữa văn bản và các phần tử khác */
+  }
+  
+  .navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar ul li {
+    display: inline;
+    margin-right: 10px;
+  }
+  
+  .navbar ul li a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .navbar ul li a:hover {
+    text-decoration: underline;
+  }
+  

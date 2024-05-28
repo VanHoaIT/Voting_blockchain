@@ -1,12 +1,15 @@
 // components/Navbar.js
 import React from 'react';
 import Link from 'next/link';
+import styles from '../styles/Navbar.module.css'; 
 
-
-const Navbar = () => {
+const Navbar = ({ userAddress }) => {
 
   return (
-    <nav>
+    <nav className={styles.navbar}>
+      <div className={styles.left}> {/* Thêm một div cho phía bên trái */}
+        <p>Địa chỉ ví: {userAddress}</p> {/* Hiển thị địa chỉ ví */}
+      </div>
       <ul>
         <li>
           <Link legacyBehavior href="/" >
@@ -15,7 +18,7 @@ const Navbar = () => {
         </li>
         <li>  
         <Link legacyBehavior href="/Page" >
-          <a>BTC</a>
+          <a>Page</a>
         </Link>
         </li>
       </ul>
