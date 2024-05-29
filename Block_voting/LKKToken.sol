@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-contract ITT {
+contract LKK {
     string public name;
     string public symbol;
     uint256 public totalSupply;
@@ -13,11 +13,10 @@ contract ITT {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     constructor() {
-        name = "ITToken";
-        symbol = "HTK";
-        totalSupply = 1000;
+        name = "LunKidToken";
+        symbol = "LKK";
+        totalSupply = 1000000; //1.000.000 token trung gian của sàn
         balanceOf[msg.sender] = totalSupply;
-        
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {

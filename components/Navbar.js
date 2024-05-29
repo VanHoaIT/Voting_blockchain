@@ -11,16 +11,31 @@ const Navbar = ({ userAddress }) => {
         <p>Địa chỉ ví: {userAddress}</p> {/* Hiển thị địa chỉ ví */}
       </div>
       <ul>
+
         <li>
           <Link legacyBehavior href="/" >
             <a>Home</a>
           </Link>
         </li>
+
         <li>  
         <Link legacyBehavior href="/Page" >
           <a>Page</a>
         </Link>
         </li>
+
+        <li>  
+        <Link legacyBehavior href="/Transaction" >
+          <a>Transaction</a>
+        </Link>
+        </li>
+
+        <li>  
+        <Link legacyBehavior href="/History" >
+          <a>History</a>
+        </Link>
+        </li>
+
       </ul>
     </nav>
   );

@@ -1,5 +1,5 @@
 export const LKKAddress = '0x7f720d8182cF23A7EA6555EA332757D17Cfd6ce9'
-export const ExchangeAddress = '0x7C5128718F1C5C4501aD79a82A3452f17a9C881f'
+export const ExchangeAddress = '0xB0ec79765F2452810F3110430AdA8d02d4133f02'
 
 export const ExchangeABI = 
 [

@@ -13,10 +13,14 @@ function Page() {
   const [priceInput, setPriceInput] = useState(''); // Giá nhập vào
   const [approveAmounts, setApproveAmounts] = useState({}); // Số lượng token cần ủy quyền
   const [account, setAccount] = useState(null); // Tài khoản hiện tại
+  const [tradeResults, setTradeResults] = useState({ //tìm kiếm
+    tradeIds: [],
+    sellers: [],
+    tokenAmounts: [],
+    lkkPrices: []
+  });
   
-
   useEffect(() => {
-    // Gọi hàm `getTokenList` khi trang được tải
     getTokenList();
     loadAccount();
   }, []);
@@ -48,8 +52,6 @@ function Page() {
 
   const getTokenList = async () => {
     try {
-      // Thực hiện các thao tác cần thiết để lấy danh sách token
-      // Ví dụ: Gọi hàm `getTokenList` từ hợp đồng Exchange
       const web3 = new Web3(window.ethereum);
       const exchangeContract = new web3.eth.Contract(Contract.ExchangeABI, Contract.ExchangeAddress);
       const tokens = await exchangeContract.methods.getTokenList().call();
@@ -103,11 +105,31 @@ function Page() {
     }
   };
 
+  const findTradesByToken = async () => {
+    try {
+      const web3 = new Web3(window.ethereum);
+      const exchangeContract = new web3.eth.Contract(Contract.ExchangeABI, Contract.ExchangeAddress);
+      const result = await exchangeContract.methods.findTradesByToken(tokenAddressInput).call();
+      const formattedResults = {
+        tradeIds: result.tradeIds.map(id => id.toString()),
+        sellers: result.sellers.map(seller => seller.toString()),
+        tokenAmounts: result.tokenAmounts.map(amount => amount.toString()),
+        lkkPrices: result.lkkPrices.map(price => price.toString())
+      };
+      setTradeResults(formattedResults);
+    } catch (error) {
+      console.error('Error finding trades by token:', error);
+    }
+  };
+
   return (
     <div className={styles.Page}>
-      <Navbar />
+
+      <Navbar userAddress={account}/>
+
       <div className={styles.h2}>
         <h1>Page</h1>
+
         <div className={styles.addToken}>
           <input
             type="text" 
@@ -117,6 +139,7 @@ function Page() {
           />
           <button onClick={handleAddToken}>Add Token</button>
         </div>
+
         <div className={styles.tokenList}>
           <h2>Token List:</h2>
           <ul>
@@ -151,6 +174,43 @@ function Page() {
             ))}
           </ul>
         </div>
+
+        <div>
+          <h2 className={styles.title}>Find Trades by Token</h2>
+          <select className={styles.select} onChange={(e) => setTokenAddressInput(e.target.value)} value={tokenAddressInput}>
+            <option value="" disabled>Select Token</option>
+            {tokenList.map((token, index) => (
+              <option key={index} value={token}>{token}</option>
+            ))}
+          </select>
+          <button className={styles.button_2} onClick={findTradesByToken}>Find Trades by Token</button>
+          <div className={styles.tradeResults}>
+            <h2 className={styles.title}>Trade Results</h2>
+            <div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Trade ID</th>
+                    <th>Seller</th>
+                    <th>Token Amount</th>
+                    <th>LKK Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tradeResults.tradeIds.map((tradeId, index) => (
+                    <tr key={index}>
+                      <td>{tradeId}</td>
+                      <td>{tradeResults.sellers[index]}</td>
+                      <td>{tradeResults.tokenAmounts[index]}</td>
+                      <td>{tradeResults.lkkPrices[index]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
       </div>
     </div>
   );
